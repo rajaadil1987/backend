@@ -54,7 +54,7 @@ app.get('/health', (req, res) => {
     uptime: process.uptime(),
     environment: env.nodeEnv,
     services: {
-      database: 'connected', // We'll assume DB is connected if server is running
+      database: 'connected',
       redis: redisStatus.connected ? 'connected' : 'disconnected'
     },
     redis: redisStatus
