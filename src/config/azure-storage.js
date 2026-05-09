@@ -12,6 +12,13 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(env.azureStorag
 // Get container client
 const containerClient = blobServiceClient.getContainerClient(env.azureStorage.containerName);
 
+async function prepareContainer() {
+  const exists = await containerClient.exists();
+  if (!exists) {
+    await containerClient.create();
+  }
+}
+
 async function storeBlob(buffer, filename, mimeType = 'image/jpeg') {
   const blobName = `${Date.now()}-${filename}`;
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
@@ -88,5 +95,6 @@ module.exports = {
   uploadImage: storeBlob,
   deleteImage: deleteBlob,
   getImageProperties: fetchBlobProperties,
-  generateImageUrl: createBlobUrl
+  generateImageUrl: createBlobUrl,
+  prepareContainer
 };

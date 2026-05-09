@@ -1,9 +1,13 @@
+const crypto = require('crypto');
+globalThis.crypto = crypto;
+
 require('dotenv').config();
 
 const app = require('./app');
 const initializeDatabase = require('./config/db');
 const env = require('./config/env');
 const { validateRedisConnection } = require('./config/redis');
+const { prepareContainer } = require('./config/azure-storage');
 
 async function startServer() {
   try {
@@ -16,6 +20,11 @@ async function startServer() {
     console.log('Connecting to database...');
     await initializeDatabase();
     console.log('Database connected successfully');
+
+    // Ensure Azure Blob container exists
+    console.log('Preparing Azure Blob container...');
+    await prepareContainer();
+    console.log('Azure Blob container ready');
 
     // Validate Redis connection
     console.log(' Validating Redis connection...');
