@@ -40,7 +40,7 @@ const notificationSchema = new mongoose.Schema({
 notificationSchema.index({ recipientId: 1, read: 1, createdAt: -1 });
 
 // Static methods for creating notifications
-notificationSchema.statics.createLikeNotification = async function (imageId, likerId, imageOwnerId) {
+notificationSchema.statics.createLikeNotification = async function buildLikeAlert(imageId, likerId, imageOwnerId) {
   // Don't create notification if user likes their own image
   if (likerId.toString() === imageOwnerId.toString()) {
     return null;
@@ -55,7 +55,7 @@ notificationSchema.statics.createLikeNotification = async function (imageId, lik
   });
 };
 
-notificationSchema.statics.createCommentNotification = async function (imageId, commenterId, imageOwnerId, commentText) {
+notificationSchema.statics.createCommentNotification = async function buildCommentAlert(imageId, commenterId, imageOwnerId, commentText) {
   // Don't create notification if user comments on their own image
   if (commenterId.toString() === imageOwnerId.toString()) {
     return null;

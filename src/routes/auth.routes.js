@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { signup, login } = require('../controllers/auth.controller');
+const { signup: registerHandler, login: loginHandler } = require('../controllers/auth.controller');
 const validate = require('../middleware/validate.middleware');
 
 const router = express.Router();
@@ -14,7 +14,7 @@ router.post(
     body('role').isIn(['creator', 'consumer']).withMessage('Role must be creator or consumer'),
     validate
   ],
-  signup
+  registerHandler
 );
 
 router.post(
@@ -24,7 +24,7 @@ router.post(
     body('password').notEmpty().withMessage('Password is required'),
     validate
   ],
-  login
+  loginHandler
 );
 
 module.exports = router;

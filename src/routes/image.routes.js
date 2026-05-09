@@ -1,11 +1,11 @@
 const express = require('express');
 const { body, param, query } = require('express-validator');
 const {
-  upload,
-  listImages,
-  getImageById,
-  addComment,
-  addRating
+  upload: uploadHandler,
+  listImages: listHandler,
+  getImageById: detailHandler,
+  addComment: commentHandler,
+  addRating: ratingHandler
 } = require('../controllers/image.controller');
 const { authenticate, authorize } = require('../middleware/auth.middleware');
 const validate = require('../middleware/validate.middleware');
@@ -21,7 +21,7 @@ router.get(
     query('creatorId').optional().isMongoId().withMessage('Creator id must be valid'),
     validate
   ],
-  listImages
+  listHandler
 );
 
 router.post(
@@ -35,13 +35,13 @@ router.post(
     body('location').optional().trim().isLength({ max: 120 }).withMessage('Location cannot exceed 120 characters'),
     validate
   ],
-  upload
+  uploadHandler
 );
 
 router.get(
   '/:id',
   [param('id').isMongoId().withMessage('Image id must be valid'), validate],
-  getImageById
+  detailHandler
 );
 
 router.post(
@@ -53,7 +53,7 @@ router.post(
     body('text').trim().notEmpty().withMessage('Comment text is required').isLength({ max: 300 }).withMessage('Comment is too long'),
     validate
   ],
-  addComment
+  commentHandler
 );
 
 router.post(
@@ -65,7 +65,7 @@ router.post(
     body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
     validate
   ],
-  addRating
+  ratingHandler
 );
 
 module.exports = router;

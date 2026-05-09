@@ -49,7 +49,7 @@ if (env.redisHost && env.redisPassword) {
 }
 
 // Connection validation function
-async function validateRedisConnection() {
+async function testRedisLink() {
   if (!redisClient) {
     console.warn('⚠️ Redis client not initialized - missing REDIS_HOST or REDIS_PASSWORD');
     return false;
@@ -92,7 +92,7 @@ async function validateRedisConnection() {
 }
 
 // Get Redis status
-function getRedisStatus() {
+function fetchRedisState() {
   if (!redisClient) {
     return { connected: false, status: 'not_initialized', error: 'Redis client not initialized' };
   }
@@ -106,5 +106,5 @@ function getRedisStatus() {
 }
 
 module.exports = redisClient;
-module.exports.validateRedisConnection = validateRedisConnection;
-module.exports.getRedisStatus = getRedisStatus;
+module.exports.validateRedisConnection = testRedisLink;
+module.exports.getRedisStatus = fetchRedisState;

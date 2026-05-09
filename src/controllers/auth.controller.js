@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const createToken = require('../utils/create-token');
+const generateJwtToken = require('../utils/create-token');
 
 /**
  * @swagger
@@ -69,7 +69,7 @@ const createToken = require('../utils/create-token');
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-async function signup(req, res, next) {
+async function registerUser(req, res, next) {
   try {
     const { username, email, password, role } = req.body;
 
@@ -85,7 +85,7 @@ async function signup(req, res, next) {
       role
     });
 
-    const token = createToken(user);
+    const token = generateJwtToken(user);
 
     return res.status(201).json({
       message: 'Account created successfully',
@@ -151,7 +151,7 @@ async function signup(req, res, next) {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-async function login(req, res, next) {
+async function authenticateUser(req, res, next) {
   try {
     const { email, password } = req.body;
 
@@ -165,7 +165,7 @@ async function login(req, res, next) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const token = createToken(user);
+    const token = generateJwtToken(user);
 
     return res.status(200).json({
       message: 'Login successful',
@@ -178,6 +178,6 @@ async function login(req, res, next) {
 }
 
 module.exports = {
-  signup,
-  login
+  signup: registerUser,
+  login: authenticateUser
 };

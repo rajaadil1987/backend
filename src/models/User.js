@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-userSchema.pre('save', async function hashPassword(next) {
+userSchema.pre('save', async function encryptPassword(next) {
   if (!this.isModified('password')) {
     return next();
   }
@@ -75,11 +75,11 @@ userSchema.pre('save', async function hashPassword(next) {
   next();
 });
 
-userSchema.methods.comparePassword = function comparePassword(candidatePassword) {
+userSchema.methods.comparePassword = function verifyPassword(candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-userSchema.methods.toPublicJSON = function toPublicJSON() {
+userSchema.methods.toPublicJSON = function serialize() {
   return {
     id: this._id,
     username: this.username,

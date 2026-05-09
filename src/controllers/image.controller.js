@@ -5,9 +5,9 @@ const Rating = require('../models/Rating');
 const Notification = require('../models/Notification');
 const { uploadImage, enrichImage } = require('../services/image.service');
 const { getCachedValue, setCachedValue, clearByPattern } = require('../services/cache.service');
-const buildPagination = require('../utils/pagination');
+const computePagination = require('../utils/pagination');
 
-function normalizePeople(people) {
+function parseTaggedPeople(people) {
   if (!people) {
     return [];
   }
@@ -95,7 +95,7 @@ function normalizePeople(people) {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-async function upload(req, res, next) {
+async function processImageUpload(req, res, next) {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'Image file is required' });
@@ -107,7 +107,7 @@ async function upload(req, res, next) {
       title: req.body.title,
       caption: req.body.caption,
       location: req.body.location,
-      people: normalizePeople(req.body.people),
+      people: parseTaggedPeople(req.body.people),
       url: uploadResult.url,
       publicId: uploadResult.public_id,
       creatorId: req.user._id
@@ -168,11 +168,11 @@ async function upload(req, res, next) {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-async function listImages(req, res, next) {
+async function fetchImageCollection(req, res, next) {
   try {
     const { page, limit } = req.query;
     const { creatorId } = req.query;
-    const pagination = buildPagination(page, limit);
+    const pagination = computePagination(page, limit);
 
     const cacheKey = `images:${pagination.page}:${pagination.limit}:${creatorId || 'all'}`;
     const cachedPayload = await getCachedValue(cacheKey);
@@ -260,7 +260,7 @@ async function listImages(req, res, next) {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-async function getImageById(req, res, next) {
+async function retrieveImageDetails(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -360,7 +360,7 @@ async function getImageById(req, res, next) {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-async function addComment(req, res, next) {
+async function postImageComment(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -483,7 +483,7 @@ async function addComment(req, res, next) {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-async function addRating(req, res, next) {
+async function submitImageRating(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -573,7 +573,7 @@ async function addRating(req, res, next) {
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-async function searchImages(req, res, next) {
+async function findImagesByQuery(req, res, next) {
   try {
     const searchQuery = String(req.query.q || '').trim();
 
@@ -613,10 +613,10 @@ async function searchImages(req, res, next) {
 }
 
 module.exports = {
-  upload,
-  listImages,
-  getImageById,
-  addComment,
-  addRating,
-  searchImages
+  upload: processImageUpload,
+  listImages: fetchImageCollection,
+  getImageById: retrieveImageDetails,
+  addComment: postImageComment,
+  addRating: submitImageRating,
+  searchImages: findImagesByQuery
 };

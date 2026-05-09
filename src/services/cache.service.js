@@ -1,6 +1,6 @@
 const redisClient = require('../config/redis');
 
-async function ensureConnection() {
+async function verifyRedisLink() {
   if (!redisClient) {
     return false;
   }
@@ -17,8 +17,8 @@ async function ensureConnection() {
   }
 }
 
-async function getCachedValue(key) {
-  const isConnected = await ensureConnection();
+async function retrieveCachedData(key) {
+  const isConnected = await verifyRedisLink();
 
   if (!isConnected) {
     return null;
@@ -32,8 +32,8 @@ async function getCachedValue(key) {
   }
 }
 
-async function setCachedValue(key, value, ttlSeconds = 120) {
-  const isConnected = await ensureConnection();
+async function storeCachedData(key, value, ttlSeconds = 120) {
+  const isConnected = await verifyRedisLink();
 
   if (!isConnected) {
     return;
@@ -46,8 +46,8 @@ async function setCachedValue(key, value, ttlSeconds = 120) {
   }
 }
 
-async function clearByPattern(pattern) {
-  const isConnected = await ensureConnection();
+async function invalidateCacheEntries(pattern) {
+  const isConnected = await verifyRedisLink();
 
   if (!isConnected) {
     return;
@@ -65,7 +65,7 @@ async function clearByPattern(pattern) {
 }
 
 module.exports = {
-  getCachedValue,
-  setCachedValue,
-  clearByPattern
+  getCachedValue: retrieveCachedData,
+  setCachedValue: storeCachedData,
+  clearByPattern: invalidateCacheEntries
 };

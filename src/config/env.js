@@ -15,7 +15,7 @@ if (!isTestEnvironment && missingVariables.length) {
 }
 
 // Parse Azure Storage connection string to get account name and key
-function parseAzureStorageConnectionString(connectionString) {
+function extractAzureCredentials(connectionString) {
   if (!connectionString) {
     return { accountName: 'test', accountKey: 'test' };
   }
@@ -31,7 +31,7 @@ function parseAzureStorageConnectionString(connectionString) {
   return { accountName, accountKey };
 }
 
-const azureStorage = parseAzureStorageConnectionString(process.env.AZURE_STORAGE_CONNECTION_STRING);
+const azureBlobConfig = extractAzureCredentials(process.env.AZURE_STORAGE_CONNECTION_STRING);
 
 module.exports = {
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -41,8 +41,8 @@ module.exports = {
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '3d',
   azureStorage: {
     connectionString: process.env.AZURE_STORAGE_CONNECTION_STRING || (isTestEnvironment ? 'test-connection-string' : undefined),
-    accountName: azureStorage.accountName,
-    accountKey: azureStorage.accountKey,
+    accountName: azureBlobConfig.accountName,
+    accountKey: azureBlobConfig.accountKey,
     containerName: process.env.AZURE_STORAGE_CONTAINER_NAME || (isTestEnvironment ? 'test-images' : undefined)
   },
   redisUrl: process.env.REDIS_URL || '',

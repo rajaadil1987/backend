@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const env = require('../config/env');
 
-async function authenticate(req, res, next) {
+async function verifyUserToken(req, res, next) {
   try {
     const authHeader = req.headers.authorization;
 
@@ -25,7 +25,7 @@ async function authenticate(req, res, next) {
   }
 }
 
-function authorize(...roles) {
+function checkUserRole(...roles) {
   return (req, res, next) => {
     if (!req.user || !roles.includes(req.user.role)) {
       return res.status(403).json({ message: 'Access denied' });
@@ -36,6 +36,6 @@ function authorize(...roles) {
 }
 
 module.exports = {
-  authenticate,
-  authorize
+  authenticate: verifyUserToken,
+  authorize: checkUserRole
 };

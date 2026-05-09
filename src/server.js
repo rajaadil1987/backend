@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const app = require('./app');
-const connectDatabase = require('./config/db');
+const initializeDatabase = require('./config/db');
 const env = require('./config/env');
 const { validateRedisConnection } = require('./config/redis');
 
@@ -14,7 +14,7 @@ async function startServer() {
     });
     // Connect to database first
     console.log('Connecting to database...');
-    await connectDatabase();
+    await initializeDatabase();
     console.log('Database connected successfully');
 
     // Validate Redis connection

@@ -2,7 +2,7 @@ const sharp = require('sharp');
 const { uploadImage: uploadToAzure, deleteImage: deleteFromAzure, generateImageUrl } = require('../config/azure-storage');
 
 // Helper function to detect MIME type from buffer
-function getMimeType(buffer) {
+function detectImageFormat(buffer) {
   // Check file signature to determine MIME type
   const signatures = [
     { type: 'image/jpeg', signature: [0xFF, 0xD8, 0xFF] },
@@ -28,7 +28,7 @@ function getMimeType(buffer) {
   return 'image/jpeg';
 }
 
-async function optimizeImage(buffer) {
+async function compressImage(buffer) {
   return sharp(buffer)
     .rotate()
     .resize({ width: 1600, withoutEnlargement: true })
@@ -36,10 +36,10 @@ async function optimizeImage(buffer) {
     .toBuffer();
 }
 
-async function uploadImage(buffer, filename) {
+async function saveImageToCloud(buffer, filename) {
   // Detect original MIME type
-  const originalMimeType = getMimeType(buffer);
-  const optimizedBuffer = await optimizeImage(buffer);
+  const originalMimeType = detectImageFormat(buffer);
+  const optimizedBuffer = await compressImage(buffer);
 
   // Generate a unique filename if not provided
   const uniqueFilename = filename || `image-${Date.now()}.jpg`;
@@ -64,7 +64,7 @@ async function uploadImage(buffer, filename) {
   }
 }
 
-async function deleteImage(blobName) {
+async function removeImageFromCloud(blobName) {
   try {
     await deleteFromAzure(blobName);
     return { success: true, deleted: blobName };
@@ -74,7 +74,7 @@ async function deleteImage(blobName) {
   }
 }
 
-function enrichImage(imageDoc) {
+function buildImageResponse(imageDoc) {
   const image = imageDoc && imageDoc.toObject ? imageDoc.toObject() : imageDoc;
   if (image && image.publicId) {
     image.url = generateImageUrl(image.publicId);
@@ -83,7 +83,7 @@ function enrichImage(imageDoc) {
 }
 
 module.exports = {
-  uploadImage,
-  deleteImage,
-  enrichImage
+  uploadImage: saveImageToCloud,
+  deleteImage: removeImageFromCloud,
+  enrichImage: buildImageResponse
 };

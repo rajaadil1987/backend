@@ -2,7 +2,7 @@ const multer = require('multer');
 
 const storage = multer.memoryStorage();
 
-const fileFilter = (req, file, cb) => {
+const validateImageType = (req, file, cb) => {
   if (!file.mimetype.startsWith('image/')) {
     cb(new Error('Only image files are allowed'));
     return;
@@ -13,7 +13,7 @@ const fileFilter = (req, file, cb) => {
 
 module.exports = multer({
   storage,
-  fileFilter,
+  fileFilter: validateImageType,
   limits: {
     fileSize: 5 * 1024 * 1024
   }

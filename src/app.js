@@ -10,7 +10,7 @@ const authRoutes = require('./routes/auth.routes');
 const imageRoutes = require('./routes/image.routes');
 const searchRoutes = require('./routes/search.routes');
 const notificationRoutes = require('./routes/notification.routes');
-const { notFound, errorHandler } = require('./middleware/error.middleware');
+const { notFound: missingRouteHandler, errorHandler: serverErrorHandler } = require('./middleware/error.middleware');
 const env = require('./config/env');
 const swaggerSpecs = require('./config/swagger');
 
@@ -43,10 +43,10 @@ app.use(
   })
 );
 
-const { getRedisStatus } = require('./config/redis');
+const { getRedisStatus: redisStateFetcher } = require('./config/redis');
 
 app.get('/health', (req, res) => {
-  const redisStatus = getRedisStatus();
+  const redisStatus = redisStateFetcher();
 
   const health = {
     status: 'ok',
@@ -82,7 +82,7 @@ app.use('/api/images', imageRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/notifications', notificationRoutes);
 
-app.use(notFound);
-app.use(errorHandler);
+app.use(missingRouteHandler);
+app.use(serverErrorHandler);
 
 module.exports = app;

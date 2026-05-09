@@ -12,7 +12,7 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(env.azureStorag
 // Get container client
 const containerClient = blobServiceClient.getContainerClient(env.azureStorage.containerName);
 
-async function uploadImage(buffer, filename, mimeType = 'image/jpeg') {
+async function storeBlob(buffer, filename, mimeType = 'image/jpeg') {
   const blobName = `${Date.now()}-${filename}`;
   const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
@@ -39,7 +39,7 @@ async function uploadImage(buffer, filename, mimeType = 'image/jpeg') {
   }
 }
 
-async function deleteImage(blobName) {
+async function deleteBlob(blobName) {
   try {
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.delete();
@@ -50,7 +50,7 @@ async function deleteImage(blobName) {
   }
 }
 
-async function getImageProperties(blobName) {
+async function fetchBlobProperties(blobName) {
   try {
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     const properties = await blockBlobClient.getProperties();
@@ -61,7 +61,7 @@ async function getImageProperties(blobName) {
   }
 }
 
-function generateImageUrl(publicId) {
+function createBlobUrl(publicId) {
   const credential = new StorageSharedKeyCredential(
     env.azureStorage.accountName,
     env.azureStorage.accountKey
@@ -85,8 +85,8 @@ function generateImageUrl(publicId) {
 module.exports = {
   blobServiceClient,
   containerClient,
-  uploadImage,
-  deleteImage,
-  getImageProperties,
-  generateImageUrl
+  uploadImage: storeBlob,
+  deleteImage: deleteBlob,
+  getImageProperties: fetchBlobProperties,
+  generateImageUrl: createBlobUrl
 };

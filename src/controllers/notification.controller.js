@@ -1,13 +1,13 @@
 const Notification = require('../models/Notification');
 const { generateImageUrl } = require('../config/azure-storage');
-const buildPagination = require('../utils/pagination');
+const computePagination = require('../utils/pagination');
 
 // Get user notifications
-async function getNotifications(req, res, next) {
+async function fetchUserAlerts(req, res, next) {
   try {
     const { page, limit } = req.query;
     const { type, read } = req.query;
-    const pagination = buildPagination(page, limit);
+    const pagination = computePagination(page, limit);
 
     const filter = { recipientId: req.user._id };
 
@@ -52,7 +52,7 @@ async function getNotifications(req, res, next) {
 }
 
 // Get unread notifications count
-async function getUnreadCount(req, res, next) {
+async function getPendingCount(req, res, next) {
   try {
     const unreadCount = await Notification.countDocuments({
       recipientId: req.user._id,
@@ -66,7 +66,7 @@ async function getUnreadCount(req, res, next) {
 }
 
 // Mark notification as read
-async function markAsRead(req, res, next) {
+async function acknowledgeAlert(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -93,7 +93,7 @@ async function markAsRead(req, res, next) {
 }
 
 // Mark all notifications as read
-async function markAllAsRead(req, res, next) {
+async function acknowledgeAllAlerts(req, res, next) {
   try {
     const result = await Notification.updateMany(
       { recipientId: req.user._id, read: false },
@@ -110,7 +110,7 @@ async function markAllAsRead(req, res, next) {
 }
 
 // Delete notification
-async function deleteNotification(req, res, next) {
+async function removeAlert(req, res, next) {
   try {
     const { id } = req.params;
 
@@ -132,9 +132,9 @@ async function deleteNotification(req, res, next) {
 }
 
 module.exports = {
-  getNotifications,
-  getUnreadCount,
-  markAsRead,
-  markAllAsRead,
-  deleteNotification
+  getNotifications: fetchUserAlerts,
+  getUnreadCount: getPendingCount,
+  markAsRead: acknowledgeAlert,
+  markAllAsRead: acknowledgeAllAlerts,
+  deleteNotification: removeAlert
 };

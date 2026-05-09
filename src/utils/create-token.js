@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 const env = require('../config/env');
 
-function createToken(user) {
+function generateJwtToken(user) {
   return jwt.sign(
     {
       userId: user._id,
@@ -12,4 +12,4 @@ function createToken(user) {
   );
 }
 
-module.exports = createToken;
+module.exports = generateJwtToken;
